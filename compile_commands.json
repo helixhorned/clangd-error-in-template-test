@@ -1,0 +1,17 @@
+[
+{
+  "directory": ".",
+  "command": "clang++-12 -o test.o -c test.cpp",
+  "file": "test.cpp"
+},
+{
+  "directory": ".",
+  "command": "clang++-12 -o test.o -c test_ill_ok.cpp",
+  "file": "test_ill_ok.cpp"
+},
+{
+  "directory": ".",
+  "command": "clang++-12 -o test.o -c test_ill_nok.cpp",
+  "file": "test_ill_nok.cpp"
+}
+]
