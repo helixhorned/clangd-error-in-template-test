@@ -16,8 +16,14 @@ all: $(all_log_files)
 clean:
 	rm -f $(all_log_files)
 
+cxx_ok.log:
+cxx_ill_ok.log:
+cxx_ill_nok.log:
 cxx_%.log: test_%.cpp Makefile
 	$(cxx) $< -fsyntax-only > $@ 2>&1 || true
 
+clangd_ok.log:
+clangd_ill_ok.log:
+clangd_ill_nok.log:
 clangd_%.log: test_%.cpp Makefile
 	$(clangd) --check=$< > $@ 2>&1 || true
