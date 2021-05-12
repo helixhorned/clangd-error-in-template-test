@@ -20,10 +20,16 @@ cxx_ok.log:
 cxx_ill_ok.log:
 cxx_ill_nok.log:
 cxx_%.log: test_%.cpp Makefile
-	$(cxx) $< -fsyntax-only > $@ 2>&1 || true
+	$(cxx) $< -fsyntax-only > $@ 2>&1; \
+	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0
+
+# FIXME: we don't distinguish between errors in the execution of clangd itself
+#  (e.g. compile_commands.json not found) and compilation errors of the translation
+#  unit under test.
 
 clangd_ok.log:
 clangd_ill_ok.log:
 clangd_ill_nok.log:
 clangd_%.log: test_%.cpp Makefile
-	$(clangd) --check=$< > $@ 2>&1 || true
+	$(clangd) --check=$< > $@ 2>&1; \
+	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0
