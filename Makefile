@@ -1,5 +1,13 @@
 
+## User variables
+
+# Optional: directory containing self-built 'clang++' and 'clangd' executables.
 LLVM_BIN_DIR ?=
+
+# Intended to be the system one:
+LLVM_CONFIG ?= llvm-config-12
+
+## Non-user variables
 
 DEFAULT_CXX := clang++-12
 DEFAULT_CLANGD := clangd-12
@@ -7,20 +15,38 @@ DEFAULT_CLANGD := clangd-12
 cxx := $(if $(LLVM_BIN_DIR),$(LLVM_BIN_DIR)/clang++,$(DEFAULT_CXX))
 clangd := $(if $(LLVM_BIN_DIR),$(LLVM_BIN_DIR)/clangd,$(DEFAULT_CLANGD))
 
+llvm-config := $(shell which $(LLVM_CONFIG))
+
+ifeq ($(llvm-config),)
+    $(error "$(LLVM_CONFIG) not found, use LLVM_CONFIG=<path/to/llvm-config> make")
+endif
+
+full_llvm_version := $(shell $(llvm-config) --version)
+llvm_version := $(full_llvm_version:git=)
+libdir := $(shell $(llvm-config) --libdir)
+llvm_libdir_include := $(libdir)/clang/$(llvm_version)/include
+
+cxxflags := $(if $(LLVM_BIN_DIR),-isystem $(llvm_libdir_include))
+
 all_log_files := \
   cxx_ok.log cxx_ill_ok.log cxx_ill_nok.log \
   clangd_ok.log clangd_ill_ok.log clangd_ill_nok.log
 
+## Targets
+
 all: $(all_log_files)
 
+compile_commands.json: compile_commands.json.in Makefile
+	sed 's|@cxxflags@|$(cxxflags)|g' $< > $@
+
 clean:
-	rm -f $(all_log_files)
+	rm -f $(all_log_files) compile_commands.json
 
 cxx_ok.log:
 cxx_ill_ok.log:
 cxx_ill_nok.log:
 cxx_%.log: test_%.cpp Makefile
-	$(cxx) $< -fsyntax-only > $@ 2>&1; \
+	$(cxx) $(cxxflags) $< -fsyntax-only > $@ 2>&1; \
 	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0
 
 # FIXME: we don't distinguish between errors in the execution of clangd itself
@@ -30,6 +56,6 @@ cxx_%.log: test_%.cpp Makefile
 clangd_ok.log:
 clangd_ill_ok.log:
 clangd_ill_nok.log:
-clangd_%.log: test_%.cpp Makefile
+clangd_%.log: test_%.cpp compile_commands.json Makefile
 	$(clangd) --check=$< > $@ 2>&1; \
 	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0
