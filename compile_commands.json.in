@@ -1,17 +1,17 @@
 [
 {
-  "directory": ".",
-  "command": "clang++-12 @cxxflags@ -o test.o -c test_ok.cpp",
-  "file": "test_ok.cpp"
+  "directory": "@dir@",
+  "command": "clang++-12 @cxxflags@ -o test.o -c @dir@/test_ok.cpp",
+  "file": "@dir@/test_ok.cpp"
 },
 {
-  "directory": ".",
-  "command": "clang++-12 @cxxflags@ -o test.o -c test_ill_ok.cpp",
-  "file": "test_ill_ok.cpp"
+  "directory": "@dir@",
+  "command": "clang++-12 @cxxflags@ -o test.o -c @dir@/test_ill_ok.cpp",
+  "file": "@dir@/test_ill_ok.cpp"
 },
 {
-  "directory": ".",
-  "command": "clang++-12 @cxxflags@ -o test.o -c test_ill_nok.cpp",
-  "file": "test_ill_nok.cpp"
+  "directory": "@dir@",
+  "command": "clang++-12 @cxxflags@ -o test.o -c @dir@/test_ill_nok.cpp",
+  "file": "@dir@/test_ill_nok.cpp"
 }
 ]

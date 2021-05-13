@@ -9,6 +9,9 @@ LLVM_CONFIG ?= llvm-config-12
 
 ## Non-user variables
 
+# NOTE: will be wrong if this Makefile is invoked from outside.
+THIS_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+
 DEFAULT_CXX := clang++-12
 DEFAULT_CLANGD := clangd-12
 
@@ -37,7 +40,7 @@ all_log_files := \
 all: $(all_log_files)
 
 compile_commands.json: compile_commands.json.in Makefile
-	sed 's|@cxxflags@|$(cxxflags)|g' $< > $@
+	sed 's|@cxxflags@|$(cxxflags)|g; s|@dir@|$(THIS_DIR)|g' $< > $@
 
 clean:
 	rm -f $(all_log_files) compile_commands.json
