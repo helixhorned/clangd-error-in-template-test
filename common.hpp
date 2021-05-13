@@ -14,8 +14,7 @@ extern std::map<char, Class> map;
 template <typename... Args>
 void
 DoEmplace(char key, Args&&... args) {
-    map.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(key),
-        std::forward_as_tuple(args)...);
+    map.try_emplace(
+        key,
+        args...);
 }

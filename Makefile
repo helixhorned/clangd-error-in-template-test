@@ -29,7 +29,7 @@ llvm_version := $(full_llvm_version:git=)
 libdir := $(shell $(llvm-config) --libdir)
 llvm_libdir_include := $(libdir)/clang/$(llvm_version)/include
 
-cxxflags := $(if $(LLVM_BIN_DIR),-isystem $(llvm_libdir_include))
+cxxflags := -std=c++17 $(if $(LLVM_BIN_DIR),-isystem $(llvm_libdir_include))
 
 all_log_files := \
   cxx_ok.log cxx_ill_ok.log cxx_ill_nok.log \
