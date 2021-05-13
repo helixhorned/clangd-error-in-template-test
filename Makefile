@@ -44,21 +44,22 @@ compile_commands.json: compile_commands.json.in Makefile
 
 clean:
 	rm -f $(all_log_files) compile_commands.json
+	rm -f $(patsubst %,%~,$(all_log_files))
 
 cxx_ok.log:
-cxx_ill_ok.log:
-cxx_ill_nok.log:
+cxx_ill_ok.log: cxx_ok.log
+cxx_ill_nok.log: cxx_ill_ok.log
 cxx_%.log: test_%.cpp Makefile
 	$(cxx) $(cxxflags) $< -fsyntax-only > $@ 2>&1; \
-	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0
+	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0 || (mv $@ $@~ && false)
 
 # FIXME: we don't distinguish between errors in the execution of clangd itself
 #  (e.g. compile_commands.json not found) and compilation errors of the translation
 #  unit under test.
 
 clangd_ok.log:
-clangd_ill_ok.log:
-clangd_ill_nok.log:
+clangd_ill_ok.log: clangd_ok.log
+clangd_ill_nok.log: clangd_ill_ok.log
 clangd_%.log: test_%.cpp compile_commands.json Makefile
 	$(clangd) --check=$< > $@ 2>&1; \
-	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0
+	  test $$? $(if $(findstring _ill_,$@),-ne,-eq) 0 || (mv $@ $@~ && false)
